@@ -1,6 +1,6 @@
 diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/include/c11/threads_posix.h mesa-17.0.3/include/c11/threads_posix.h
 --- mesa-17.0.3-orig/include/c11/threads_posix.h	2017-04-01 18:33:36.000000000 +0300
-+++ mesa-17.0.3/include/c11/threads_posix.h	2017-06-12 17:06:53.111879422 +0300
++++ mesa-17.0.3/include/c11/threads_posix.h	2017-07-20 19:03:55.574511433 +0300
 @@ -35,6 +35,7 @@
  #include <unistd.h>
  #include <sched.h>
@@ -20,7 +20,7 @@ diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/include/c11
  
 diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/include/c99_alloca.h mesa-17.0.3/include/c99_alloca.h
 --- mesa-17.0.3-orig/include/c99_alloca.h	2017-04-01 18:33:36.000000000 +0300
-+++ mesa-17.0.3/include/c99_alloca.h	2017-06-12 17:06:53.111879422 +0300
++++ mesa-17.0.3/include/c99_alloca.h	2017-07-20 19:03:55.574511433 +0300
 @@ -35,7 +35,7 @@
  
  #  define alloca _alloca
@@ -30,9 +30,21 @@ diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/include/c99
  
  #  include <alloca.h>
  
+diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/compiler/Makefile.am mesa-17.0.3/src/compiler/Makefile.am
+--- mesa-17.0.3-orig/src/compiler/Makefile.am	2017-04-01 18:33:36.000000000 +0300
++++ mesa-17.0.3/src/compiler/Makefile.am	2017-07-20 19:03:55.574511433 +0300
+@@ -59,6 +59,6 @@
+ MKDIR_GEN = $(AM_V_at)$(MKDIR_P) $(@D)
+ PYTHON_GEN = $(AM_V_GEN)$(PYTHON2) $(PYTHON_FLAGS)
+ 
+-include Makefile.glsl.am
++# include Makefile.glsl.am
+ 
+-include Makefile.nir.am
++# include Makefile.nir.am
 diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/compiler/Makefile.glsl.am mesa-17.0.3/src/compiler/Makefile.glsl.am
 --- mesa-17.0.3-orig/src/compiler/Makefile.glsl.am	2017-04-01 18:33:36.000000000 +0300
-+++ mesa-17.0.3/src/compiler/Makefile.glsl.am	2017-06-12 17:06:53.111879422 +0300
++++ mesa-17.0.3/src/compiler/Makefile.glsl.am	2017-07-20 19:03:55.574511433 +0300
 @@ -53,7 +53,7 @@
  	glsl/tests/sampler-types-test			\
  	glsl/tests/uniform-initializer-test
@@ -44,7 +56,7 @@ diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/compile
  	glsl/tests/blob_test.c
 diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/compiler/Makefile.nir.am mesa-17.0.3/src/compiler/Makefile.nir.am
 --- mesa-17.0.3-orig/src/compiler/Makefile.nir.am	2017-04-01 18:33:36.000000000 +0300
-+++ mesa-17.0.3/src/compiler/Makefile.nir.am	2017-06-12 17:06:53.111879422 +0300
++++ mesa-17.0.3/src/compiler/Makefile.nir.am	2017-07-20 19:03:55.574511433 +0300
 @@ -51,7 +51,7 @@
  	$(MKDIR_GEN)
  	$(PYTHON_GEN) $(srcdir)/nir/nir_opt_algebraic.py > $@ || ($(RM) $@; false)
@@ -56,7 +68,7 @@ diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/compile
  	spirv/spirv2nir.c
 diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/compiler/nir/nir_instr_set.c mesa-17.0.3/src/compiler/nir/nir_instr_set.c
 --- mesa-17.0.3-orig/src/compiler/nir/nir_instr_set.c	2017-04-01 18:33:36.000000000 +0300
-+++ mesa-17.0.3/src/compiler/nir/nir_instr_set.c	2017-06-12 17:06:53.111879422 +0300
++++ mesa-17.0.3/src/compiler/nir/nir_instr_set.c	2017-07-20 19:03:55.574511433 +0300
 @@ -20,7 +20,6 @@
   * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
   * IN THE SOFTWARE.
@@ -67,7 +79,7 @@ diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/compile
  
 diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/compiler/nir/nir_liveness.c mesa-17.0.3/src/compiler/nir/nir_liveness.c
 --- mesa-17.0.3-orig/src/compiler/nir/nir_liveness.c	2017-04-01 18:33:36.000000000 +0300
-+++ mesa-17.0.3/src/compiler/nir/nir_liveness.c	2017-06-12 17:06:53.111879422 +0300
++++ mesa-17.0.3/src/compiler/nir/nir_liveness.c	2017-07-20 19:03:55.574511433 +0300
 @@ -23,7 +23,6 @@
   * Authors:
   *    Jason Ekstrand (jason@jlekstrand.net)
@@ -78,7 +90,7 @@ diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/compile
  #include "nir_vla.h"
 diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/gallium/auxiliary/hud/hud_context.c mesa-17.0.3/src/gallium/auxiliary/hud/hud_context.c
 --- mesa-17.0.3-orig/src/gallium/auxiliary/hud/hud_context.c	2017-04-01 18:33:37.000000000 +0300
-+++ mesa-17.0.3/src/gallium/auxiliary/hud/hud_context.c	2017-06-12 17:06:53.475879414 +0300
++++ mesa-17.0.3/src/gallium/auxiliary/hud/hud_context.c	2017-07-20 19:03:55.574511433 +0300
 @@ -36,6 +36,7 @@
  #include <inttypes.h>
  #include <signal.h>
@@ -89,7 +101,7 @@ diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/gallium
  #include "hud/hud_private.h"
 diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/gallium/auxiliary/os/os_misc.c mesa-17.0.3/src/gallium/auxiliary/os/os_misc.c
 --- mesa-17.0.3-orig/src/gallium/auxiliary/os/os_misc.c	2017-04-01 18:33:37.000000000 +0300
-+++ mesa-17.0.3/src/gallium/auxiliary/os/os_misc.c	2017-06-12 17:06:53.479879414 +0300
++++ mesa-17.0.3/src/gallium/auxiliary/os/os_misc.c	2017-07-20 19:03:55.574511433 +0300
 @@ -47,7 +47,7 @@
  #endif
  
@@ -110,7 +122,7 @@ diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/gallium
  
 diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/gallium/auxiliary/os/os_time.c mesa-17.0.3/src/gallium/auxiliary/os/os_time.c
 --- mesa-17.0.3-orig/src/gallium/auxiliary/os/os_time.c	2017-04-01 18:33:37.000000000 +0300
-+++ mesa-17.0.3/src/gallium/auxiliary/os/os_time.c	2017-06-12 17:06:53.479879414 +0300
++++ mesa-17.0.3/src/gallium/auxiliary/os/os_time.c	2017-07-20 19:03:55.574511433 +0300
 @@ -36,6 +36,10 @@
  #include "pipe/p_defines.h"
  #include "util/u_atomic.h"
@@ -122,9 +134,21 @@ diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/gallium
  #if defined(PIPE_OS_UNIX)
  #  include <time.h> /* timeval */
  #  include <sys/time.h> /* timeval */
+diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/Makefile.am mesa-17.0.3/src/Makefile.am
+--- mesa-17.0.3-orig/src/Makefile.am	2017-04-01 18:33:36.000000000 +0300
++++ mesa-17.0.3/src/Makefile.am	2017-07-20 19:03:55.574511433 +0300
+@@ -73,7 +73,7 @@
+ endif
+ 
+ # include only conditionally ?
+-SUBDIRS += compiler
++# SUBDIRS += compiler
+ 
+ if HAVE_AMD_DRIVERS
+ SUBDIRS += amd
 diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/mesa/main/compiler.h mesa-17.0.3/src/mesa/main/compiler.h
---- mesa-17.0.3-orig/src/mesa/main/compiler.h  2017-04-01 18:33:37.000000000 +0300
-+++ mesa-17.0.3/src/mesa/main/compiler.h       2017-06-27 14:10:57.442988538 +0300
+--- mesa-17.0.3-orig/src/mesa/main/compiler.h	2017-04-01 18:33:37.000000000 +0300
++++ mesa-17.0.3/src/mesa/main/compiler.h	2017-07-20 19:03:55.574511433 +0300
 @@ -40,6 +40,13 @@
  
  #include "c99_compat.h" /* inline, __func__, etc. */
@@ -139,9 +163,206 @@ diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/mesa/ma
  
  #ifdef __cplusplus
  extern "C" {
+diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/mesa/main/ff_fragment_shader.cpp mesa-17.0.3/src/mesa/main/ff_fragment_shader.cpp
+--- mesa-17.0.3-orig/src/mesa/main/ff_fragment_shader.cpp	2017-04-01 18:33:37.000000000 +0300
++++ mesa-17.0.3/src/mesa/main/ff_fragment_shader.cpp	2017-07-20 19:18:40.352061965 +0300
+@@ -514,6 +514,7 @@
+ static ir_rvalue *
+ get_current_attrib(texenv_fragment_program *p, GLuint attrib)
+ {
++#if 0
+    ir_variable *current;
+    ir_rvalue *val;
+ 
+@@ -523,11 +524,14 @@
+    val = new(p->mem_ctx) ir_dereference_variable(current);
+    ir_rvalue *index = new(p->mem_ctx) ir_constant(attrib);
+    return new(p->mem_ctx) ir_dereference_array(val, index);
++#endif
++   return NULL;
+ }
+ 
+ static ir_rvalue *
+ get_gl_Color(texenv_fragment_program *p)
+ {
++#if 0
+    if (p->state->inputs_available & VARYING_BIT_COL0) {
+       ir_variable *var = p->shader->symbols->get_variable("gl_Color");
+       assert(var);
+@@ -535,12 +539,15 @@
+    } else {
+       return get_current_attrib(p, VERT_ATTRIB_COLOR0);
+    }
++#endif
++   return NULL;
+ }
+ 
+ static ir_rvalue *
+ get_source(texenv_fragment_program *p,
+ 	   GLuint src, GLuint unit)
+ {
++#if 0
+    ir_variable *var;
+    ir_dereference *deref;
+ 
+@@ -586,6 +593,8 @@
+       assert(0);
+       return NULL;
+    }
++#endif
++   return NULL;
+ }
+ 
+ static ir_rvalue *
+@@ -594,6 +603,7 @@
+ 		    GLuint source,
+ 		    GLuint operand)
+ {
++#if 0
+    ir_rvalue *src;
+ 
+    src = get_source(p, source, unit);
+@@ -621,6 +631,8 @@
+       assert(0);
+       return src;
+    }
++#endif
++   return NULL;
+ }
+ 
+ /**
+@@ -666,10 +678,13 @@
+ static ir_rvalue *
+ smear(ir_rvalue *val)
+ {
++#if 0
+    if (!val->type->is_scalar())
+       return val;
+ 
+    return swizzle_xxxx(val);
++#endif
++   return NULL;
+ }
+ 
+ static ir_rvalue *
+@@ -679,6 +694,7 @@
+ 	     GLuint mode,
+ 	     const struct mode_opt *opt)
+ {
++#if 0
+    ir_rvalue *src[MAX_COMBINER_TERMS];
+    ir_rvalue *tmp0, *tmp1;
+    GLuint i;
+@@ -743,6 +759,8 @@
+       assert(0);
+       return src[0];
+    }
++#endif
++   return NULL;
+ }
+ 
+ /**
+@@ -751,6 +769,7 @@
+ static ir_rvalue *
+ emit_texenv(texenv_fragment_program *p, GLuint unit)
+ {
++#if 0
+    const struct state_key *key = p->state;
+    GLboolean rgb_saturate, alpha_saturate;
+    GLuint rgb_shift, alpha_shift;
+@@ -869,6 +888,8 @@
+    }
+    else
+       return deref;
++#endif
++   return NULL;
+ }
+ 
+ 
+@@ -877,6 +898,7 @@
+  */
+ static void load_texture( texenv_fragment_program *p, GLuint unit )
+ {
++#if 0
+    ir_dereference *deref;
+ 
+    if (p->src_texture[unit])
+@@ -1000,6 +1022,7 @@
+    tex->projector = swizzle_w(texcoord);
+ 
+    p->emit(assign(p->src_texture[unit], tex));
++#endif
+ }
+ 
+ static void
+@@ -1060,6 +1083,7 @@
+ emit_fog_instructions(texenv_fragment_program *p,
+ 		      ir_rvalue *fragcolor)
+ {
++#if 0
+    struct state_key *key = p->state;
+    ir_rvalue *f, *temp;
+    ir_variable *params, *oparams;
+@@ -1130,11 +1154,14 @@
+    p->emit(assign(fog_result, add(temp, mul(fragcolor, f_var)), WRITEMASK_XYZ));
+ 
+    return new(p->mem_ctx) ir_dereference_variable(fog_result);
++#endif 
++   return NULL;
+ }
+ 
+ static void
+ emit_instructions(texenv_fragment_program *p)
+ {
++#if 0
+    struct state_key *key = p->state;
+    GLuint unit;
+ 
+@@ -1187,6 +1214,7 @@
+    ir_variable *frag_color = p->shader->symbols->get_variable("gl_FragColor");
+    assert(frag_color);
+    p->emit(assign(frag_color, cf));
++#endif
+ }
+ 
+ /**
+@@ -1196,6 +1224,7 @@
+ static struct gl_shader_program *
+ create_new_program(struct gl_context *ctx, struct state_key *key)
+ {
++#if 0
+    texenv_fragment_program p;
+    unsigned int unit;
+    _mesa_glsl_parse_state *state;
+@@ -1290,6 +1319,8 @@
+ 
+    ralloc_free(p.mem_ctx);
+    return p.shader_program;
++#endif
++   return NULL;
+ }
+ 
+ extern "C" {
+@@ -1301,6 +1332,7 @@
+ struct gl_shader_program *
+ _mesa_get_fixed_func_fragment_program(struct gl_context *ctx)
+ {
++#if 0
+    struct gl_shader_program *shader_program;
+    struct state_key key;
+    GLuint keySize;
+@@ -1319,6 +1351,8 @@
+    }
+ 
+    return shader_program;
++#endif
++   return NULL;
+ }
+ 
+ }
 diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/mesa/main/mm.h mesa-17.0.3/src/mesa/main/mm.h
---- mesa-17.0.3-orig/src/mesa/main/mm.h        2017-04-01 18:33:37.000000000 +0300
-+++ mesa-17.0.3/src/mesa/main/mm.h     2017-06-27 18:28:58.096253603 +0300
+--- mesa-17.0.3-orig/src/mesa/main/mm.h	2017-04-01 18:33:37.000000000 +0300
++++ mesa-17.0.3/src/mesa/main/mm.h	2017-07-20 19:03:56.350481196 +0300
 @@ -38,8 +38,13 @@
     struct mem_block *heap;
     unsigned ofs;
@@ -156,9 +377,59 @@ diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/mesa/ma
  };
  
  
+diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/mesa/Makefile.am mesa-17.0.3/src/mesa/Makefile.am
+--- mesa-17.0.3-orig/src/mesa/Makefile.am	2017-04-01 18:33:37.000000000 +0300
++++ mesa-17.0.3/src/mesa/Makefile.am	2017-07-20 19:03:56.354481040 +0300
+@@ -132,24 +132,34 @@
+ endif
+ 
+ libmesa_la_SOURCES = \
+-	$(MESA_FILES) \
+-	$(PROGRAM_FILES) \
+-	$(PROGRAM_NIR_FILES) \
+-	$(MESA_ASM_FILES_FOR_ARCH)
++	$(MESA_FILES)
++
++#	$(MESA_FILES) \
++#	$(PROGRAM_FILES) \
++#	$(PROGRAM_NIR_FILES) \
++#	$(MESA_ASM_FILES_FOR_ARCH)
+ 
+ libmesa_la_LIBADD = \
+-	$(top_builddir)/src/compiler/glsl/libglsl.la \
+-	$(ARCH_LIBS)
++	$(ARCH_LIBS) \
++	$(top_srcdir)/src/util/libmesautil.la
++
++#	$(top_builddir)/src/compiler/glsl/libglsl.la \
++#	$(ARCH_LIBS)
+ 
+ libmesagallium_la_SOURCES = \
+-	$(MESA_GALLIUM_FILES) \
+-	$(PROGRAM_FILES) \
+-	$(PROGRAM_NIR_FILES) \
+-	$(MESA_ASM_FILES_FOR_ARCH)
++	$(MESA_GALLIUM_FILES)
++
++#	$(MESA_GALLIUM_FILES) \
++#	$(PROGRAM_FILES) \
++#	$(PROGRAM_NIR_FILES) \
++#	$(MESA_ASM_FILES_FOR_ARCH)
+ 
+ libmesagallium_la_LIBADD = \
+-	$(top_builddir)/src/compiler/glsl/libglsl.la \
+-	$(ARCH_LIBS)
++	$(ARCH_LIBS) \
++	$(top_srcdir)/src/util/libmesautil.la
++
++#	$(top_builddir)/src/compiler/glsl/libglsl.la \
++#	$(ARCH_LIBS)
+ 
+ libmesa_sse41_la_SOURCES = \
+ 	$(X86_SSE41_FILES)
 diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/mesa/program/prog_instruction.h mesa-17.0.3/src/mesa/program/prog_instruction.h
---- mesa-17.0.3-orig/src/mesa/program/prog_instruction.h       2017-04-01 18:33:37.000000000 +0300
-+++ mesa-17.0.3/src/mesa/program/prog_instruction.h    2017-06-27 19:18:01.243197282 +0300
+--- mesa-17.0.3-orig/src/mesa/program/prog_instruction.h	2017-04-01 18:33:37.000000000 +0300
++++ mesa-17.0.3/src/mesa/program/prog_instruction.h	2017-07-20 19:03:56.354481040 +0300
 @@ -223,7 +223,7 @@
     enum prog_opcode Opcode;
     struct prog_src_register SrcReg[3];
@@ -199,10 +470,9 @@ diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/mesa/pr
      * For BRA and CAL instructions, the location to jump to.
      * For BGNLOOP, points to ENDLOOP (and vice-versa).
      * For BRK, points to ENDLOOP
-
 diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/mesa/state_tracker/st_glsl_to_tgsi.cpp mesa-17.0.3/src/mesa/state_tracker/st_glsl_to_tgsi.cpp
 --- mesa-17.0.3-orig/src/mesa/state_tracker/st_glsl_to_tgsi.cpp	2017-04-01 18:33:37.000000000 +0300
-+++ mesa-17.0.3/src/mesa/state_tracker/st_glsl_to_tgsi.cpp	2017-06-12 17:06:53.479879414 +0300
++++ mesa-17.0.3/src/mesa/state_tracker/st_glsl_to_tgsi.cpp	2017-07-20 19:03:56.354481040 +0300
 @@ -55,7 +55,7 @@
  #include "st_glsl_types.h"
  #include "st_nir.h"
@@ -222,9 +492,8 @@ diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/mesa/st
  
  static unsigned
 diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/mesa/vbo/vbo.h mesa-17.0.3/src/mesa/vbo/vbo.h
-bo/vbo.h mesa-17.0.3/src/mesa/vbo/vbo.h
---- mesa-17.0.3-orig/src/mesa/vbo/vbo.h        2017-04-01 18:33:37.000000000 +0300
-+++ mesa-17.0.3/src/mesa/vbo/vbo.h     2017-06-27 18:29:31.010612701 +0300
+--- mesa-17.0.3-orig/src/mesa/vbo/vbo.h	2017-04-01 18:33:37.000000000 +0300
++++ mesa-17.0.3/src/mesa/vbo/vbo.h	2017-07-20 19:03:56.354481040 +0300
 @@ -44,6 +44,7 @@
  struct gl_transform_feedback_object;
  
@@ -253,7 +522,7 @@ bo/vbo.h mesa-17.0.3/src/mesa/vbo/vbo.h
     GLint basevertex;
 diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/util/debug.c mesa-17.0.3/src/util/debug.c
 --- mesa-17.0.3-orig/src/util/debug.c	2017-04-01 18:33:37.000000000 +0300
-+++ mesa-17.0.3/src/util/debug.c	2017-06-12 17:06:53.479879414 +0300
++++ mesa-17.0.3/src/util/debug.c	2017-07-20 19:03:56.394479481 +0300
 @@ -21,6 +21,7 @@
   * IN THE SOFTWARE.
   */
@@ -264,7 +533,7 @@ diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/util/de
  #include "debug.h"
 diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/util/ralloc.c mesa-17.0.3/src/util/ralloc.c
 --- mesa-17.0.3-orig/src/util/ralloc.c	2017-04-01 18:33:37.000000000 +0300
-+++ mesa-17.0.3/src/util/ralloc.c	2017-06-19 14:55:55.942393197 +0300
++++ mesa-17.0.3/src/util/ralloc.c	2017-07-20 19:03:56.394479481 +0300
 @@ -636,8 +636,9 @@
     linear_header *new_node;
     linear_size_chunk *ptr;
@@ -306,4 +575,3 @@ diff -aur -x configure -x Makefile.in -x aclocal.m4 mesa-17.0.3-orig/src/util/ra
     return node->ralloc_parent;
  }
  
-
