@@ -14,10 +14,34 @@
 #include <drivers/audio/portaudio.h>
 #include <fs/file_format.h>
 #include <util/math.h>
+#include <framework/mod/options.h>
+
+#define MINIMAL_BUILD      OPTION_GET(BOOLEAN, minimal_build)
+#if MINIMAL_BUILD
+ #define WAV_FILES_SUPPORT 0
+ #define FRAMES_PER_BUFF   160
+ #define CHAN_N_DEFAULT    1
+#else
+ #define WAV_FILES_SUPPORT  OPTION_GET(BOOLEAN, wav_files_support)
+ #define FRAMES_PER_BUFF   (256 * 1024 / 4)
+ #define CHAN_N_DEFAULT    2
+#endif
+
+struct _wav_info {
+	uint16_t format;
+	uint16_t chan_n;
+	uint32_t sample_rate;
+	uint16_t bits_per_sample;
+	uint32_t fdata_len;
+};
 
 static void print_usage(void) {
+#if WAV_FILES_SUPPORT
 	printf("Usage: play [WAVAUDIOFILE]\n"
 	       "       play -s\n");
+#else
+	printf("Usage: play -s\n");
+#endif
 }
 
 double _sin(double x) {
@@ -54,9 +78,12 @@ static int sin_callback(const void *inputBuffer, void *outputBuffer,
 	return 0;
 }
 
+#if WAV_FILES_SUPPORT
+static FILE *wav_fd = NULL;
 static uint8_t _fbuffer[64 * 1024 * 1024];
 static int _bl = 64 * 1024 * 1024;
 static int _fchan = 2;
+
 static int fd_callback(const void *inputBuffer, void *outputBuffer,
 		unsigned long framesPerBuffer,
 		const PaStreamCallbackTimeInfo* timeInfo,
@@ -80,18 +107,61 @@ static int fd_callback(const void *inputBuffer, void *outputBuffer,
 	}
 }
 
+static int read_wav_file(const char *filename, struct _wav_info *wi) {
+	static uint8_t fmt_buf[128];
+
+	if (NULL == (wav_fd = fopen(filename, "r"))) {
+		printf("Can't open file %s\n", filename);
+		return 0;
+	}
+	fread(fmt_buf, 1, 44, wav_fd);
+	if (raw_get_file_format(fmt_buf) != RIFF_FILE) {
+		printf("%s is not a RIFF audio file\n", filename);
+		return 0;
+	}
+
+	wi->format       = *((uint16_t*) &fmt_buf[20]);
+	wi->chan_n          = *((uint16_t*) &fmt_buf[22]);
+	wi->sample_rate     = *((uint32_t*) &fmt_buf[24]);
+	wi->bits_per_sample = *((uint16_t*) &fmt_buf[34]);
+	wi->fdata_len       = *((uint32_t*) &fmt_buf[40]);
+
+	printf("File size:             %d bytes\n",
+	       *((uint32_t*) &fmt_buf[4]));
+	printf("File type header:      %c%c%c%c\n",
+	        fmt_buf[8], fmt_buf[9], fmt_buf[10], fmt_buf[11]);
+	printf("Length of format data: %d\n", *((uint32_t*) &fmt_buf[16]));
+	printf("Type format:           %d\n", wi->format);
+	printf("Number of channels:    %d\n", wi->chan_n);
+	printf("Sample rate:           %d\n", wi->sample_rate);
+	printf("Bits per sample:       %d\n", wi->bits_per_sample);
+	printf("Size of data section:  %d\n", wi->fdata_len);
+
+	if (wi->bits_per_sample * wi->sample_rate * wi->chan_n == 0) {
+		printf("Check bps, sample rate and channel number, they should not be zero!\n");
+		return -1;
+	}
+
+	printf("Progress:\n");
+
+	_bl = min(fread(_fbuffer, 1, 64 * 1024 * 1024, wav_fd), _bl);
+	_fchan = wi->chan_n;
+	return 0;
+}
+#endif
+
 int main(int argc, char **argv) {
 	int opt;
 	int err;
-	FILE *fd = NULL;
-	static uint8_t fmt_buf[128];
-	int chan_n = 2;
-	int sample_rate = 44100;
-	int bits_per_sample = 16;
-	int fdata_len = 0x100000;
 	int sleep_msec;
+	struct _wav_info wi = {
+		.chan_n = CHAN_N_DEFAULT,
+		.sample_rate = 44100,
+		.bits_per_sample = 16,
+		.fdata_len = 0x100000
+	};
 
-	PaStreamCallback *callback;
+	PaStreamCallback *callback = NULL;
 	PaStream *stream = NULL;
 
 	struct PaStreamParameters out_par;
@@ -100,8 +170,6 @@ int main(int argc, char **argv) {
 		print_usage();
 		return 0;
 	}
-
-	callback = &fd_callback;
 
 	while (-1 != (opt = getopt(argc, argv, "nsh"))) {
 		switch (opt) {
@@ -117,54 +185,32 @@ int main(int argc, char **argv) {
 		}
 	}
 
-	if (callback == fd_callback) {
-		if (NULL == (fd = fopen(argv[argc - 1], "r"))) {
-			printf("Can't open file %s\n", argv[argc - 1]);
-			return 0;
-		}
-
-		fread(fmt_buf, 1, 44, fd);
-		if (raw_get_file_format(fmt_buf) != RIFF_FILE) {
-			printf("%s is not a RIFF audio file\n", argv[argc - 1]);
-			return 0;
-		}
-
-		chan_n          = *((uint16_t*) &fmt_buf[22]);
-		sample_rate     = *((uint32_t*) &fmt_buf[24]);
-		bits_per_sample = *((uint16_t*) &fmt_buf[34]);
-		fdata_len       = *((uint32_t*) &fmt_buf[40]);
-		printf("File size:             %d bytes\n",
-		       *((uint32_t*) &fmt_buf[4]));
-		printf("File type header:      %c%c%c%c\n",
-		        fmt_buf[8], fmt_buf[9], fmt_buf[10], fmt_buf[11]);
-		printf("Length of format data: %d\n", *((uint32_t*) &fmt_buf[16]));
-		printf("Type format:           %d\n", *((uint16_t*) &fmt_buf[20]));
-		printf("Number of channels:    %d\n", chan_n);
-		printf("Sample rate:           %d\n", sample_rate);
-		printf("Bits per sample:       %d\n", bits_per_sample);
-		printf("Size of data section:  %d\n", fdata_len);
-
-		if (bits_per_sample * sample_rate * chan_n == 0) {
-			printf("Check bps, sample rate and channel number, they should not be zero!\n");
-			goto err_close_fd;
-		}
-
-		printf("Progress:\n");
-
-		_bl = min(fread(_fbuffer, 1, 64 * 1024 * 1024, fd), _bl);
-		_fchan = chan_n;
+#if WAV_FILES_SUPPORT
+	if (callback == NULL) {
+		callback = &fd_callback;
 	}
-
+	if (callback == fd_callback) {
+		err = read_wav_file(argv[argc - 1], &wi);
+		if (err != 0) {
+			goto err_clean;
+		}
+	}
+#else
+	if (callback == NULL) {
+		print_usage();
+		return 0;
+	}
+#endif
 
 	/* Initialize PA */
 	if (paNoError != (err = Pa_Initialize())) {
 		printf("Portaudio error: could not initialize!\n");
-		goto err_close_fd;
+		goto err_clean;
 	}
 
 	out_par = (PaStreamParameters) {
 		.device                    = 0,
-		.channelCount              = chan_n,
+		.channelCount              = wi.chan_n,
 		.sampleFormat              = paInt16,
 		.suggestedLatency          = 10,
 		.hostApiSpecificStreamInfo = NULL,
@@ -173,8 +219,8 @@ int main(int argc, char **argv) {
 	err = Pa_OpenStream(&stream,
 			NULL,
 			&out_par,
-			sample_rate,
-			256 * 1024 / 4,
+			wi.sample_rate,
+			FRAMES_PER_BUFF,
 			0,
 			callback,
 			NULL);
@@ -189,8 +235,8 @@ int main(int argc, char **argv) {
 		goto err_terminate_pa;
 	}
 
-	sleep_msec = 1000 * (fdata_len /
-	           (bits_per_sample / 8 * sample_rate * chan_n));
+	sleep_msec = 1000 * (wi.fdata_len /
+	           (wi.bits_per_sample / 8 * wi.sample_rate * wi.chan_n));
 	Pa_Sleep(sleep_msec);
 
 	if (paNoError != (err = Pa_StopStream(stream))) {
@@ -207,8 +253,11 @@ err_terminate_pa:
 	if (paNoError != (err = Pa_Terminate()))
 		printf("Portaudio error: could not terminate!\n");
 
-err_close_fd:
-	if (fd)
-		fclose(fd);
+err_clean:
+#if WAV_FILES_SUPPORT
+	if (wav_fd)
+		fclose(wav_fd);
+#endif
+
 	return 0;
 }
