@@ -1,0 +1,16 @@
+package embox.driver.audio
+
+@BuildDepends(third_party.bsp.st_f4.core)
+module stm32f4 {
+	option number log_level = 1
+
+	option number volume=70
+	option number sample_rate=44100
+
+	@IncludePath("$(EXTERNAL_BUILD_DIR)/third_party/bsp/st_f4/core/STM32F4xx_Ethernet_Example/Utilities/STM32F4-Discovery/")
+	source "stm32f4_audio.c"
+
+	depends embox.compat.posix.util.sleep
+	depends embox.driver.audio.portaudio_lib
+	depends embox.driver.audio.audio_dev
+}
