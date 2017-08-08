@@ -176,6 +176,8 @@ static const struct audio_dev_ops aaci_pl041_dev_ops = {
 static uint8_t dac1_out_buf[AACI_MAXBUF_LEN_MAX_BUF_LEN] __attribute__ ((aligned(0x1000)));
 static uint8_t adc1_in_buf[AACI_MAXBUF_LEN_MAX_BUF_LEN] __attribute__ ((aligned(0x1000)));
 
+static struct audio_dev_info audio_dev_info[3];
+
 static struct aaci_pl041_dev_priv aaci_pl041_dac1 = {
 	.hw_dev      = &aaci_pl041_hw_dev,
 	.devid       = 0,
@@ -195,9 +197,9 @@ static struct aaci_pl041_dev_priv aaci_pl041_adc1 = {
 	.in_buf_len  = sizeof(adc1_in_buf)
 };
 
-AUDIO_DEV_DEF("aaci_pl041_dac1", (struct audio_dev_ops *)&aaci_pl041_dev_ops, &aaci_pl041_dac1);
-AUDIO_DEV_DEF("aaci_pl041_dac2", (struct audio_dev_ops *)&aaci_pl041_dev_ops, &aaci_pl041_dac2);
-AUDIO_DEV_DEF("aaci_pl041_adc1", (struct audio_dev_ops *)&aaci_pl041_dev_ops, &aaci_pl041_adc1);
+AUDIO_DEV_DEF("aaci_pl041_dac1", (struct audio_dev_ops *)&aaci_pl041_dev_ops, &aaci_pl041_dac1, &audio_dev_info[0]);
+AUDIO_DEV_DEF("aaci_pl041_dac2", (struct audio_dev_ops *)&aaci_pl041_dev_ops, &aaci_pl041_dac2, &audio_dev_info[1]);
+AUDIO_DEV_DEF("aaci_pl041_adc1", (struct audio_dev_ops *)&aaci_pl041_dev_ops, &aaci_pl041_adc1, &audio_dev_info[2]);
 
 uint8_t *audio_dev_get_out_cur_ptr(struct audio_dev *audio_dev) {
 	struct aaci_pl041_dev_priv *priv;

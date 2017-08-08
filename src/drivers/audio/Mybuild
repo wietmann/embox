@@ -2,8 +2,11 @@ package embox.driver.audio
 
 module audio_dev {
 	option number log_level=1
+	option number opened_devs_cnt=2
 	source "audio_dev.c"
 
 	@IncludeExport(path="drivers/audio")
 	source "audio_dev.h"
+
+	depends embox.mem.pool
 }

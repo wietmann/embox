@@ -23,23 +23,27 @@ struct audio_dev_ops {
 	int (*ad_ops_ioctl)(struct audio_dev *dev, int cmd, void *args);
 };
 
+struct audio_dev_info {
+	size_t buf_len;
+	uint8_t num_of_chan;
+};
+
 struct audio_dev {
 	struct audio_dev_ops *ad_ops;
 	const char *ad_name;
 	void *ad_priv;
-	size_t buf_len;
-	uint8_t num_of_chan;
+	struct audio_dev_info *info;
 	uint8_t max_chan;
 };
 
-#define AUDIO_DEV_DEF(name, ops, priv) \
+#define AUDIO_DEV_DEF(name, ops, priv, info) \
 	ARRAY_SPREAD_DECLARE(const struct audio_dev, __audio_device_registry); \
-	ARRAY_SPREAD_ADD(__audio_device_registry, {ops,name, priv} )
+	ARRAY_SPREAD_ADD(__audio_device_registry, {ops, name, priv, info} )
 
 extern struct audio_dev *audio_dev_get_by_idx(int idx);
-
 extern struct audio_dev *audio_dev_get_by_name(char name[]);
 
+/* Must be implemented in each audio driver */
 extern uint8_t *audio_dev_get_in_cur_ptr(struct audio_dev *audio_dev);
 extern uint8_t *audio_dev_get_out_cur_ptr(struct audio_dev *audio_dev);
 
