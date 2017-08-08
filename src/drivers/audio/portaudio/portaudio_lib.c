@@ -70,13 +70,17 @@ static void _stereo_to_mono(void *buf, int len) {
 static void *pa_thread_hnd(void *arg) {
 	int err;
 	struct audio_dev *audio_dev;
+	struct audio_dev_info *info;
 	uint8_t *out_buf;
 	uint8_t *in_buf;
 	int inp_frames;
 	int out_frames;
 
 	audio_dev = audio_dev_get_by_idx(pa_stream.devid);
+	info = audio_dev->info;
+
 	assert(audio_dev);
+	assert(audio_dev->info);
 	assert(audio_dev->ad_ops);
 	assert(audio_dev->ad_ops->ad_ops_start);
 	assert(audio_dev->ad_ops->ad_ops_resume);
@@ -90,7 +94,7 @@ static void *pa_thread_hnd(void *arg) {
 	SCHED_WAIT(pa_stream.active);
 	audio_dev->ad_ops->ad_ops_start(audio_dev);
 
-	out_frames = audio_dev->buf_len; /* This one is in bytes */
+	out_frames = info->buf_len; /* This one is in bytes */
 
 	switch (pa_stream.sample_format) {
 	case paInt8:
@@ -124,10 +128,10 @@ static void *pa_thread_hnd(void *arg) {
 		out_buf = audio_dev_get_out_cur_ptr(audio_dev);
 		in_buf  = audio_dev_get_in_cur_ptr(audio_dev);
 
-		log_debug("out_buf = 0x%X, buf_len %d", out_buf, audio_dev->buf_len);
+		log_debug("out_buf = 0x%X, buf_len %d", out_buf, info->buf_len);
 
 		if (out_buf)
-			memset(out_buf, 0, audio_dev->buf_len);
+			memset(out_buf, 0, info->buf_len);
 
 		err = pa_stream.callback(in_buf,
 			out_buf,
@@ -145,10 +149,10 @@ static void *pa_thread_hnd(void *arg) {
 			}
 		}
 		/* Sort out problems related to the number of channels */
-		if (pa_stream.number_of_chan != audio_dev->num_of_chan) {
-			if (pa_stream.number_of_chan == 1 && audio_dev->num_of_chan == 2) {
+		if (pa_stream.number_of_chan != info->num_of_chan) {
+			if (pa_stream.number_of_chan == 1 && info->num_of_chan == 2) {
 				_mono_to_stereo(out_buf, inp_frames);
-			} else if (pa_stream.number_of_chan == 2 && audio_dev->num_of_chan == 1) {
+			} else if (pa_stream.number_of_chan == 2 && info->num_of_chan == 1) {
 				_stereo_to_mono(out_buf, inp_frames);
 			} else {
 				log_error("Audio configuration is broken!"
@@ -181,6 +185,7 @@ PaError Pa_OpenStream(PaStream** stream,
 		PaStreamFlags streamFlags, PaStreamCallback *streamCallback,
 		void *userData) {
 	struct audio_dev *audio_dev;
+	struct audio_dev_info *info;
 
 	assert(stream != NULL);
 	assert(streamFlags == paNoFlag || streamFlags == paClipOff);
@@ -215,14 +220,15 @@ PaError Pa_OpenStream(PaStream** stream,
 	assert(audio_dev->ad_ops);
 	assert(audio_dev->ad_ops->ad_ops_ioctl);
 	assert(audio_dev->ad_ops->ad_ops_start);
+	info = audio_dev->info;
 
-	audio_dev->buf_len = audio_dev->ad_ops->ad_ops_ioctl(audio_dev, ADIOCTL_BUFLEN, NULL);
-	if (audio_dev->buf_len == -1) {
+	info->buf_len = audio_dev->ad_ops->ad_ops_ioctl(audio_dev, ADIOCTL_BUFLEN, NULL);
+	if (info->buf_len == -1) {
 		return paInvalidDevice;
 	}
 
 	/* TODO work on mono sound device */
-	audio_dev->num_of_chan = 2;
+	info->num_of_chan = 2;
 
 	pa_thread = thread_create(THREAD_FLAG_SUSPENDED, pa_thread_hnd, NULL);
 

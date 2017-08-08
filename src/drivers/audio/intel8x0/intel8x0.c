@@ -369,6 +369,8 @@ static int intel_ac_ioctl(struct audio_dev *dev, int cmd, void *args) {
 	return -1;
 }
 
+static struct audio_dev_info audio_dev_info[3];
+
 static const struct audio_dev_ops intel_ac_dev_ops = {
 	.ad_ops_start  = intel_ac_dev_start,
 	.ad_ops_pause  = intel_ac_dev_pause,
@@ -396,9 +398,9 @@ static struct intel_ac_dev_priv intel_ac_adc1 = {
 	.in_buf_len  = sizeof(adc1_in_buf)
 };
 
-AUDIO_DEV_DEF("intel_ac_dac1", (struct audio_dev_ops *)&intel_ac_dev_ops, &intel_ac_dac1);
-AUDIO_DEV_DEF("intel_ac_dac2", (struct audio_dev_ops *)&intel_ac_dev_ops, &intel_ac_dac2);
-AUDIO_DEV_DEF("intel_ac_adc1", (struct audio_dev_ops *)&intel_ac_dev_ops, &intel_ac_adc1);
+AUDIO_DEV_DEF("intel_ac_dac1", (struct audio_dev_ops *)&intel_ac_dev_ops, &intel_ac_dac1, &audio_dev_info[0]);
+AUDIO_DEV_DEF("intel_ac_dac2", (struct audio_dev_ops *)&intel_ac_dev_ops, &intel_ac_dac2, &audio_dev_info[1]);
+AUDIO_DEV_DEF("intel_ac_adc1", (struct audio_dev_ops *)&intel_ac_dev_ops, &intel_ac_adc1, &audio_dev_info[3]);
 
 uint8_t *audio_dev_get_in_cur_ptr(struct audio_dev *audio_dev) {
 	return _in_buf_by_dev(audio_dev);
