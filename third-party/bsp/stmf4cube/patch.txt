@@ -1,0 +1,29 @@
+diff -aur -x configure ../STM32Cube_FW_F4_V1.13.0-orig/STM32Cube_FW_F4_V1.13.0/Drivers/BSP/STM32F4-Discovery/stm32f4_discovery_audio.c STM32Cube_FW_F4_V1.13.0/Drivers/BSP/STM32F4-Discovery/stm32f4_discovery_audio.c
+--- ../STM32Cube_FW_F4_V1.13.0-orig/STM32Cube_FW_F4_V1.13.0/Drivers/BSP/STM32F4-Discovery/stm32f4_discovery_audio.c	2016-06-27 14:19:56.000000000 +0300
++++ STM32Cube_FW_F4_V1.13.0/Drivers/BSP/STM32F4-Discovery/stm32f4_discovery_audio.c	2017-08-09 16:15:27.122010611 +0300
+@@ -779,6 +779,7 @@
+   */
+ uint8_t BSP_AUDIO_IN_PDMToPCM(uint16_t *PDMBuf, uint16_t *PCMBuf)
+ {
++#if 0
+   uint16_t AppPDM[INTERNAL_BUFF_SIZE/2];
+   uint32_t index = 0; 
+   
+@@ -798,7 +799,7 @@
+   {
+     PCMBuf[(index<<1)+1] = PCMBuf[index<<1];
+   }
+-  
++#endif
+   /* Return AUDIO_OK when all operations are correctly done */
+   return AUDIO_OK; 
+ }
+@@ -879,7 +880,7 @@
+        to make stereo audio streams */
+     Filter[i].Out_MicChannels = 2;
+     Filter[i].In_MicChannels = ChnlNbr; 
+-    PDM_Filter_Init((PDMFilter_InitStruct *)&Filter[i]);
++    //PDM_Filter_Init((PDMFilter_InitStruct *)&Filter[i]);
+   }  
+ }
+ 
