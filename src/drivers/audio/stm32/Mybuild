@@ -15,17 +15,17 @@ module stm32f4 {
 	depends embox.driver.audio.audio_dev
 }
 
-@BuildDepends(third_party.bsp.stmf4cube.core)
-@BuildDepends(third_party.bsp.stmf4cube.stm32f4_discovery)
 @BuildDepends(third_party.bsp.stmf4cube.stm32f4_discovery_audio)
-module stm32f4_cube {
+module stm32_audio_f4 {
 	option number log_level = 1
-
 	option number volume=70
 	option number sample_rate=44100
 
+	@IncludeExport(path="drivers/audio", target_name="stm32_audio.h")
+	source "stm32_audio_f4.h"
+
 	@IncludePath("$(EXTERNAL_BUILD_DIR)/third_party/bsp/stmf4cube/core/STM32Cube_FW_F4_V1.13.0/Drivers/STM32F3xx_HAL_Driver/Inc/")
-	source "stm32f4cube_audio.c"
+	source "stm32_audio.c"
 
 	depends embox.compat.posix.util.sleep
 	depends embox.driver.audio.portaudio_lib
