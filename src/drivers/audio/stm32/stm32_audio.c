@@ -10,10 +10,8 @@
 #include <errno.h>
 #include <util/log.h>
 #include <stdio.h>
-#include <assert.h>
 #include <drivers/audio/portaudio.h>
 #include <drivers/audio/audio_dev.h>
-#include <kernel/irq.h>
 #include <kernel/panic.h>
 
 #include <drivers/audio/stm32_audio.h>
@@ -34,7 +32,7 @@ struct stm32_dev_priv {
 static uint8_t dac_out_bufs[STM32_MAX_BUF_LEN * 2];
 
 static void stm32_dev_start(struct audio_dev *dev) {
-	if (0 != irq_attach(STM32_AUDIO_I2S_DMA_IRQ, stm32_audio_i2s_dma_interrupt,
+	if (0 != irq_attach(STM32_AUDIO_OUT_IRQ, stm32_audio_i2s_dma_interrupt,
 				0, dev, "stm32_audio")) {
 		log_error("irq_attach error");
 	}
@@ -64,7 +62,7 @@ static void stm32_dev_stop(struct audio_dev *dev) {
 		log_error("BSP_AUDIO_OUT_Stop error");
 	}
 
-	irq_detach(STM32_AUDIO_I2S_DMA_IRQ, NULL);
+	irq_detach(STM32_AUDIO_OUT_IRQ, NULL);
 }
 
 static int stm32_dev_ioctl(struct audio_dev *dev, int cmd, void *args) {
@@ -122,17 +120,11 @@ void BSP_AUDIO_OUT_Error_CallBack() {
 	log_error("");
 }
 
-extern I2S_HandleTypeDef hAudioOutI2s;
-
-void I2S3_IRQHandler(void) {
-  HAL_DMA_IRQHandler(hAudioOutI2s.hdmatx);
-}
-
 static irq_return_t stm32_audio_i2s_dma_interrupt(unsigned int irq_num,
 		void *audio_dev) {
-	I2S3_IRQHandler();
+	audio_out_irq_handler();
 	return IRQ_HANDLED;
 }
 
-static_assert(63 == STM32_AUDIO_I2S_DMA_IRQ);
-STATIC_IRQ_ATTACH(63, stm32_audio_i2s_dma_interrupt, NULL);
+//static_assert(63 == STM32_AUDIO_I2S_DMA_IRQ);
+STATIC_IRQ_ATTACH(STM32_AUDIO_OUT_IRQ, stm32_audio_i2s_dma_interrupt, NULL);
