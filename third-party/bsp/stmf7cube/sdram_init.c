@@ -23,6 +23,16 @@
 EMBOX_UNIT_INIT(sdram_init);
 
 static int sdram_init(void) {
-  BSP_SDRAM_Init();
-  return 0;
+	if (BSP_SDRAM_Init() != SDRAM_OK) {
+		return -1;
+	}
+	return 0;
+}
+
+uint32_t sdram_start_address(void) {
+	return SDRAM_DEVICE_ADDR;
+}
+
+uint32_t sdram_size(void) {
+	return SDRAM_DEVICE_SIZE;
 }

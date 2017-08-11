@@ -19,6 +19,9 @@ module play {
 	source "play.c"
 
 	option boolean wav_files_support=true
+	/* wav_sdram=true allows you to store wav into sdram for STM32F7-Discovery */
+	option boolean wav_sdram=false
+	option number  audio_buf_size=4000000
 
 	/* minimal_build=true provides you with wav_files_support=false also */
 	option boolean minimal_build=false

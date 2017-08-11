@@ -23,6 +23,8 @@
  #define CHAN_N_DEFAULT    1
 #else
  #define WAV_FILES_SUPPORT  OPTION_GET(BOOLEAN, wav_files_support)
+ #define AUDIO_BUF_SIZE     OPTION_GET(NUMBER,  audio_buf_size)
+ #define AUDIO_SDRAM        OPTION_GET(BOOLEAN, wav_sdram)
  #define FRAMES_PER_BUFF   (256 * 1024 / 4)
  #define CHAN_N_DEFAULT    2
 #endif
@@ -80,9 +82,21 @@ static int sin_callback(const void *inputBuffer, void *outputBuffer,
 
 #if WAV_FILES_SUPPORT
 static FILE *wav_fd = NULL;
-static uint8_t _fbuffer[64 * 1024 * 1024];
-static int _bl = 64 * 1024 * 1024;
 static int _fchan = 2;
+static int _fbuf_len = AUDIO_BUF_SIZE;
+static uint8_t *_fbuf;
+
+#ifndef AUDIO_SDRAM
+static uint8_t static_audio_buffer[AUDIO_BUF_SIZE];
+static void audio_buf_init(void) {
+	_fbuf = static_audio_buffer;
+}
+#else
+extern uint32_t sdram_start_address(void);
+static void audio_buf_init(void) {
+	_fbuf = (uint8_t*) sdram_start_address;
+}
+#endif /* AUDIO_SDRAM */
 
 static int fd_callback(const void *inputBuffer, void *outputBuffer,
 		unsigned long framesPerBuffer,
@@ -90,15 +104,15 @@ static int fd_callback(const void *inputBuffer, void *outputBuffer,
 		PaStreamCallbackFlags statusFlags,
 		void *userData) {
 	static int _ptr = 0;
-        int read_bytes;
+	int read_bytes;
 
-	read_bytes = min(_bl - _ptr, framesPerBuffer * _fchan * 2); /* Stereo 16-bit */
-	memcpy(outputBuffer, &_fbuffer[_ptr], read_bytes);
+	read_bytes = min(_fbuf_len - _ptr, framesPerBuffer * _fchan * 2); /* Stereo 16-bit */
+	memcpy(outputBuffer, &_fbuf[_ptr], read_bytes);
 	_ptr += read_bytes;
 
 	printf("|");
 	fflush(stdout);
-	if (_ptr < _bl) {
+	if (_ptr < _fbuf_len) {
 		return paContinue;
 	} else {
 		printf("\n");
@@ -144,11 +158,13 @@ static int read_wav_file(const char *filename, struct _wav_info *wi) {
 
 	printf("Progress:\n");
 
-	_bl = min(fread(_fbuffer, 1, 64 * 1024 * 1024, wav_fd), _bl);
+	audio_buf_init();
+
+	_fbuf_len = min(fread(_fbuf, 1, 64 * 1024 * 1024, wav_fd), _fbuf_len);
 	_fchan = wi->chan_n;
 	return 0;
 }
-#endif
+#endif /* WAV_FILES_SUPPORT */
 
 int main(int argc, char **argv) {
 	int opt;
