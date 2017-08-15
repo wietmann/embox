@@ -12,3 +12,14 @@ module stm32f4_sd extends sd {
 	depends embox.driver.block_common
 	depends third_party.bsp.st_f4.core
 }
+
+@BuildDepends(third_party.bsp.stmf7cube.core)
+module stm32f7_sd extends sd {
+	option number log_level = 1
+	option number sd_buf_size=4096
+
+	source "stm32f7_sd.c"
+
+	depends embox.driver.block_common
+	depends third_party.bsp.stmf7cube.core
+}
