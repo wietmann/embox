@@ -16,6 +16,9 @@
 #include <util/math.h>
 #include <framework/mod/options.h>
 
+#include "stm32746g_discovery.h"
+#include "stm32746g_discovery_sd.h"
+
 #define MINIMAL_BUILD      OPTION_GET(BOOLEAN, minimal_build)
 #if MINIMAL_BUILD
  #define WAV_FILES_SUPPORT 0
@@ -27,6 +30,8 @@
  #define AUDIO_SDRAM        OPTION_GET(BOOLEAN, wav_sdram)
  #define FRAMES_PER_BUFF   (256 * 1024 / 4)
  #define CHAN_N_DEFAULT    2
+ 
+ #define FS_WORKAROUND      OPTION_GET(BOOLEAN, fs_workaround)
 #endif
 
 struct _wav_info {
@@ -86,7 +91,7 @@ static int _fchan = 2;
 static int _fbuf_len = AUDIO_BUF_SIZE;
 static uint8_t *_fbuf;
 
-#ifndef AUDIO_SDRAM
+#if !AUDIO_SDRAM
 static uint8_t static_audio_buffer[AUDIO_BUF_SIZE];
 static void audio_buf_init(void) {
 	_fbuf = static_audio_buffer;
@@ -94,7 +99,7 @@ static void audio_buf_init(void) {
 #else
 extern uint32_t sdram_start_address(void);
 static void audio_buf_init(void) {
-	_fbuf = (uint8_t*) sdram_start_address;
+	_fbuf = (uint8_t*) sdram_start_address();
 }
 #endif /* AUDIO_SDRAM */
 
@@ -107,6 +112,7 @@ static int fd_callback(const void *inputBuffer, void *outputBuffer,
 	int read_bytes;
 
 	read_bytes = min(_fbuf_len - _ptr, framesPerBuffer * _fchan * 2); /* Stereo 16-bit */
+	//printf("FP = %d, LEN - %d, read_bytes = %d\n", framesPerBuffer, framesPerBuffer * _fchan * 2, read_bytes);
 	memcpy(outputBuffer, &_fbuf[_ptr], read_bytes);
 	_ptr += read_bytes;
 
@@ -122,6 +128,15 @@ static int fd_callback(const void *inputBuffer, void *outputBuffer,
 }
 
 static int read_wav_file(const char *filename, struct _wav_info *wi) {
+#if FS_WORKAROUND
+	static uint8_t fmt_buf[512];
+	int res, i;
+	res = BSP_SD_ReadBlocks((uint32_t*) fmt_buf, 0, 512, 1);
+	if (res != SD_OK) {
+		printf("play: BSP_SD_ReadBlocks read 0 block failed\n");
+		return -1;
+	}
+#else
 	static uint8_t fmt_buf[128];
 
 	if (NULL == (wav_fd = fopen(filename, "r"))) {
@@ -129,6 +144,8 @@ static int read_wav_file(const char *filename, struct _wav_info *wi) {
 		return 0;
 	}
 	fread(fmt_buf, 1, 44, wav_fd);
+#endif
+
 	if (raw_get_file_format(fmt_buf) != RIFF_FILE) {
 		printf("%s is not a RIFF audio file\n", filename);
 		return 0;
@@ -160,7 +177,21 @@ static int read_wav_file(const char *filename, struct _wav_info *wi) {
 
 	audio_buf_init();
 
+#if FS_WORKAROUND
+	for (i = 1; i < wi->fdata_len / 512; i++) {
+		res = BSP_SD_ReadBlocks((uint32_t*) (_fbuf + i * 512), i * 512, 512, 1);
+		while (res != SD_OK) {
+			printf("play: BSP_SD_ReadBlocks read %d block failed\n", i);
+			res = BSP_SD_ReadBlocks((uint32_t*) (_fbuf + i * 512), i * 512, 512, 1);
+		}
+	}
+#else
 	_fbuf_len = min(fread(_fbuf, 1, 64 * 1024 * 1024, wav_fd), _fbuf_len);
+#endif
+	printf("play: File read completed successfully!\n");
+
+	_fbuf_len = wi->fdata_len;
+
 	_fchan = wi->chan_n;
 	return 0;
 }

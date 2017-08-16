@@ -14,7 +14,7 @@ package embox.cmd
 	AUTHORS
 		Denis Deryugin <deryugin.denis@gmail.com>
 	''')
-
+@BuildDepends(third_party.bsp.stmf7cube.core)
 module play {
 	source "play.c"
 
@@ -25,6 +25,8 @@ module play {
 
 	/* minimal_build=true provides you with wav_files_support=false also */
 	option boolean minimal_build=false
+	
+	option boolean fs_workaround=false
 
 	depends embox.driver.audio.portaudio_api
 	depends embox.fs.file_format
