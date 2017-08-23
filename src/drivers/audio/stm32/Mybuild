@@ -25,7 +25,7 @@ module stm32_audio_f4 {
 	source "stm32_audio_f4.h"
 
 	@IncludePath("$(EXTERNAL_BUILD_DIR)/third_party/bsp/stmf4cube/core/STM32Cube_FW_F4_V1.13.0/Drivers/STM32F3xx_HAL_Driver/Inc/")
-	source "stm32_audio.c"
+	source "stm32_audio_out.c"
 
 	depends embox.compat.posix.util.sleep
 	depends embox.driver.audio.portaudio_lib
@@ -42,7 +42,8 @@ module stm32_audio_f7 {
 	@IncludeExport(path="drivers/audio", target_name="stm32_audio.h")
 	source "stm32_audio_f7.h"
 
-	source "stm32_audio.c"
+	source "stm32_audio_out.c"
+	source "stm32_audio_in.c"
 
 	depends embox.compat.posix.util.sleep
 	depends embox.driver.audio.portaudio_lib
