@@ -4,5 +4,6 @@ PKG_NAME := stm32f7
 PKG_SOURCES := https://www.dropbox.com/s/2u5cuh3gmrv375m/stm32cubef7.zip?dl=0
 PKG_ARCHIVE_NAME :=stm32cubef7.zip
 PKG_MD5     := 15f04dadded7602d1406cc0623ba0e22
+PKG_PATCHES := patch.txt
 
 include $(EXTBLD_LIB)

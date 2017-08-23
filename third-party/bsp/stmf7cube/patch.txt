@@ -1,0 +1,76 @@
+diff -aur -x configure ../STM32Cube_FW_F7_V1.5.0-orig/STM32Cube_FW_F7_V1.5.0/Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_audio.c STM32Cube_FW_F7_V1.5.0/Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_audio.c
+--- ../STM32Cube_FW_F7_V1.5.0-orig/STM32Cube_FW_F7_V1.5.0/Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_audio.c	2016-09-14 09:48:22.000000000 +0300
++++ STM32Cube_FW_F7_V1.5.0/Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_audio.c	2017-08-19 21:24:11.493559461 +0300
+@@ -1073,33 +1073,33 @@
+   * @brief  User callback when record buffer is filled.
+   * @retval None
+   */
+-__weak void BSP_AUDIO_IN_TransferComplete_CallBack(void)
+-{
+-  /* This function should be implemented by the user application.
+-     It is called into this driver when the current buffer is filled
+-     to prepare the next buffer pointer and its size. */
+-}
+-
+-/**
+-  * @brief  Manages the DMA Half Transfer complete event.
+-  * @retval None
+-  */
+-__weak void BSP_AUDIO_IN_HalfTransfer_CallBack(void)
+-{ 
+-  /* This function should be implemented by the user application.
+-     It is called into this driver when the current buffer is filled
+-     to prepare the next buffer pointer and its size. */
+-}
+-
+-/**
+-  * @brief  Audio IN Error callback function.
+-  * @retval None
+-  */
+-__weak void BSP_AUDIO_IN_Error_CallBack(void)
+-{   
+-  /* This function is called when an Interrupt due to transfer error on or peripheral
+-     error occurs. */
+-}
++//__weak void BSP_AUDIO_IN_TransferComplete_CallBack(void)
++//{
++//  /* This function should be implemented by the user application.
++//     It is called into this driver when the current buffer is filled
++//     to prepare the next buffer pointer and its size. */
++//}
++//
++///**
++//  * @brief  Manages the DMA Half Transfer complete event.
++//  * @retval None
++//  */
++//__weak void BSP_AUDIO_IN_HalfTransfer_CallBack(void)
++//{ 
++//  /* This function should be implemented by the user application.
++//     It is called into this driver when the current buffer is filled
++//     to prepare the next buffer pointer and its size. */
++//}
++//
++///**
++//  * @brief  Audio IN Error callback function.
++//  * @retval None
++//  */
++//__weak void BSP_AUDIO_IN_Error_CallBack(void)
++//{   
++//  /* This function is called when an Interrupt due to transfer error on or peripheral
++//     error occurs. */
++//}
+ 
+ /**
+   * @brief  Initializes BSP_AUDIO_IN MSP.
+diff -aur -x configure ../STM32Cube_FW_F7_V1.5.0-orig/STM32Cube_FW_F7_V1.5.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_sdmmc.c STM32Cube_FW_F7_V1.5.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_sdmmc.c
+--- ../STM32Cube_FW_F7_V1.5.0-orig/STM32Cube_FW_F7_V1.5.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_sdmmc.c	2016-09-23 17:58:32.000000000 +0300
++++ STM32Cube_FW_F7_V1.5.0/Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_sdmmc.c	2017-08-19 21:13:46.729394194 +0300
+@@ -229,7 +229,7 @@
+              Init.ClockPowerSave      |\
+              Init.BusWide             |\
+              Init.HardwareFlowControl |\
+-             Init.ClockDiv
++             (9 << 5)
+              ); 
+   
+   /* Write to SDMMC CLKCR */
