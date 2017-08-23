@@ -16,23 +16,26 @@
 #include <util/math.h>
 #include <framework/mod/options.h>
 
+/* FIXME */
 #include "stm32746g_discovery.h"
 #include "stm32746g_discovery_sd.h"
 
 #define MINIMAL_BUILD      OPTION_GET(BOOLEAN, minimal_build)
 #if MINIMAL_BUILD
- #define WAV_FILES_SUPPORT 0
  #define FRAMES_PER_BUFF   160
  #define CHAN_N_DEFAULT    1
 #else
- #define WAV_FILES_SUPPORT  OPTION_GET(BOOLEAN, wav_files_support)
  #define AUDIO_BUF_SIZE     OPTION_GET(NUMBER,  audio_buf_size)
  #define AUDIO_SDRAM        OPTION_GET(BOOLEAN, wav_sdram)
  #define FRAMES_PER_BUFF   (256 * 1024 / 4)
  #define CHAN_N_DEFAULT    2
  
- #define FS_WORKAROUND      OPTION_GET(BOOLEAN, fs_workaround)
+ #define WAV_STORAGE       OPTION_GET(NUMBER, wav_storage)
 #endif
+
+#define WAV_FS     0
+#define WAV_SDCARD 1
+#define WAV_SDRAM  2
 
 struct _wav_info {
 	uint16_t format;
@@ -43,7 +46,7 @@ struct _wav_info {
 };
 
 static void print_usage(void) {
-#if WAV_FILES_SUPPORT
+#if WAV_FS
 	printf("Usage: play [WAVAUDIOFILE]\n"
 	       "       play -s\n");
 #else
@@ -85,7 +88,7 @@ static int sin_callback(const void *inputBuffer, void *outputBuffer,
 	return 0;
 }
 
-#if WAV_FILES_SUPPORT
+#if !MINIMAL_BUILD
 static FILE *wav_fd = NULL;
 static int _fchan = 2;
 static int _fbuf_len = AUDIO_BUF_SIZE;
@@ -128,22 +131,25 @@ static int fd_callback(const void *inputBuffer, void *outputBuffer,
 }
 
 static int read_wav_file(const char *filename, struct _wav_info *wi) {
-#if FS_WORKAROUND
-	static uint8_t fmt_buf[512];
+	static uint8_t fmt_buf[128];
+#if WAV_STORAGE == WAV_SDRAM
+	audio_buf_init();
+	memcpy(fmt_buf, _fbuf, 128);
+#elif WAV_STORAGE == WAV_SDCARD
 	int res, i;
 	res = BSP_SD_ReadBlocks((uint32_t*) fmt_buf, 0, 512, 1);
 	if (res != SD_OK) {
 		printf("play: BSP_SD_ReadBlocks read 0 block failed\n");
 		return -1;
 	}
-#else
-	static uint8_t fmt_buf[128];
-
+#elif WAV_STORAGE == WAV_FS
 	if (NULL == (wav_fd = fopen(filename, "r"))) {
 		printf("Can't open file %s\n", filename);
 		return 0;
 	}
 	fread(fmt_buf, 1, 44, wav_fd);
+#elif
+ #error "Undefined WAV_STORAGE"
 #endif
 
 	if (raw_get_file_format(fmt_buf) != RIFF_FILE) {
@@ -175,9 +181,7 @@ static int read_wav_file(const char *filename, struct _wav_info *wi) {
 
 	printf("Progress:\n");
 
-	audio_buf_init();
-
-#if FS_WORKAROUND
+#if WAV_STORAGE == WAV_SDCARD
 	for (i = 1; i < wi->fdata_len / 512; i++) {
 		res = BSP_SD_ReadBlocks((uint32_t*) (_fbuf + i * 512), i * 512, 512, 1);
 		while (res != SD_OK) {
@@ -185,7 +189,7 @@ static int read_wav_file(const char *filename, struct _wav_info *wi) {
 			res = BSP_SD_ReadBlocks((uint32_t*) (_fbuf + i * 512), i * 512, 512, 1);
 		}
 	}
-#else
+#elif WAV_STORAGE == WAV_FS
 	_fbuf_len = min(fread(_fbuf, 1, 64 * 1024 * 1024, wav_fd), _fbuf_len);
 #endif
 	printf("play: File read completed successfully!\n");
@@ -195,7 +199,7 @@ static int read_wav_file(const char *filename, struct _wav_info *wi) {
 	_fchan = wi->chan_n;
 	return 0;
 }
-#endif /* WAV_FILES_SUPPORT */
+#endif /* MINIMAL_BUILD */
 
 int main(int argc, char **argv) {
 	int opt;
@@ -213,10 +217,12 @@ int main(int argc, char **argv) {
 
 	struct PaStreamParameters out_par;
 
+#if WAV_STORAGE == WAV_FS
 	if (argc < 2) {
 		print_usage();
 		return 0;
 	}
+#endif
 
 	while (-1 != (opt = getopt(argc, argv, "nsh"))) {
 		switch (opt) {
@@ -232,7 +238,7 @@ int main(int argc, char **argv) {
 		}
 	}
 
-#if WAV_FILES_SUPPORT
+#if !MINIMAL_BUILD
 	if (callback == NULL) {
 		callback = &fd_callback;
 	}
@@ -301,7 +307,7 @@ err_terminate_pa:
 		printf("Portaudio error: could not terminate!\n");
 
 err_clean:
-#if WAV_FILES_SUPPORT
+#if !MINIMAL_BUILD
 	if (wav_fd)
 		fclose(wav_fd);
 #endif

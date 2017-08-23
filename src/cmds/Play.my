@@ -26,7 +26,8 @@ module play {
 	/* minimal_build=true provides you with wav_files_support=false also */
 	option boolean minimal_build=false
 	
-	option boolean fs_workaround=false
+	/* Possible values: 0, 1, 2 */
+	option number wav_storage = 0
 
 	depends embox.driver.audio.portaudio_api
 	depends embox.fs.file_format
