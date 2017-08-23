@@ -16,7 +16,6 @@
 
 #include <drivers/audio/stm32_audio.h>
 
-extern void Audio_MAL_I2S_IRQHandler(void);
 static irq_return_t stm32_audio_i2s_dma_interrupt(unsigned int irq_num,
         void *dev_id);
 
@@ -37,10 +36,12 @@ static void stm32_dev_start(struct audio_dev *dev) {
 		log_error("irq_attach error");
 	}
 
-	if (0 != BSP_AUDIO_OUT_Init(OUTPUT_DEVICE_AUTO, DEFAULT_VOLUME,
+	if (0 != BSP_AUDIO_OUT_Init(OUTPUT_DEVICE_HEADPHONE, DEFAULT_VOLUME,
 				DEFAULT_SAMPLE_RATE)) {
 		log_error("EVAL_AUDIO_Init error");
 	}
+
+	BSP_AUDIO_OUT_SetFrequency(22500);
 
 	if (0 != BSP_AUDIO_OUT_Play((uint16_t*) &dac_out_bufs[0], sizeof(dac_out_bufs))) {
 		log_error("EVAL_AUDIO_Play error");
@@ -126,5 +127,4 @@ static irq_return_t stm32_audio_i2s_dma_interrupt(unsigned int irq_num,
 	return IRQ_HANDLED;
 }
 
-//static_assert(63 == STM32_AUDIO_I2S_DMA_IRQ);
 STATIC_IRQ_ATTACH(STM32_AUDIO_OUT_IRQ, stm32_audio_i2s_dma_interrupt, NULL);
