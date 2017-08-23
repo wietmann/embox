@@ -27,7 +27,8 @@ OLIBM_CPU  := $(subst -mcpu=,,$(filter -mcpu=%,$(CFLAGS)))
 ifeq ($(strip $(OLIBM_CPU)),cortex-m7)
 # We do not pass -march=armv7e-m because it does not working together with -mcpu=cortex-m7
 # See https://bugs.launchpad.net/gcc-arm-embedded/+bug/1592635
-OLIBM_ARCH :=""
+#OLIBM_ARCH :=""
+OLIBM_ARCH := armv7e-m
 else
 OLIBM_ARCH := $(subst -march=,,$(filter -march=%,$(CFLAGS)))
 endif # cortex-m7
