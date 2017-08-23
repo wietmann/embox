@@ -21,3 +21,30 @@ module record {
 	depends embox.driver.audio.portaudio_api
 	depends embox.fs.file_format
 }
+
+@AutoCmd
+@Cmd(name = "record_stm32",
+     help = "Simple audio recorder for stm32",
+     man  = '''
+     	NAME
+		record - simple audio recorder
+	SYNOPSIS
+		record [OPTION] [FILE]
+	DESCRIPTION
+		Writes up to 10 seconds to FILE in WAV format.
+	OPTIONS
+	AUTHORS
+		Denis Deryugin <deryugin.denis@gmail.com>
+	''')
+
+@BuildDepends(third_party.bsp.stmf7cube.core)
+module record_stm32 {
+	option boolean wav_sdram=false
+
+	option number  audio_buf_size=4000000
+
+	source "record_stm32.c"
+
+	depends embox.driver.audio.portaudio_api
+	depends embox.fs.file_format
+}
