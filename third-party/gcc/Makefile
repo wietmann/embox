@@ -35,6 +35,7 @@ cppflags = -I$(ROOT_DIR)/third-party/gcc/include \
 PKG_BUILD_DIR  := $(BUILD_DIR)/build
 
 $(CONFIGURE) :
+	export EMBOX_GCC_LINK=full; \
 	mkdir -p $(PKG_BUILD_DIR) && cd $(PKG_BUILD_DIR) && ( \
 		. $(EMBOX_GCC_ENV) && $(PKG_SOURCE_DIR)/configure \
 			--target=$(AUTOCONF_TARGET_TRIPLET) \
@@ -46,21 +47,21 @@ $(CONFIGURE) :
 			--without-newlib \
 			--enable-languages=c,c++ \
 			--enable-soft-float \
-			CC_FOR_TARGET=$${EMBOX_CROSS_COMPILE}gcc \
-			CXX_FOR_TARGET=$${EMBOX_CROSS_COMPILE}g++ \
-			CFLAGS_FOR_TARGET="$(cppflags) $(target_libgcc_cppflags) $${EMBOX_IMPORTED_CFLAGS}" \
-			CXXFLAGS_FOR_TARGET="$(cppflags) $${EMBOX_IMPORTED_CXXFLAGS} -fpermissive" \
-			LDFLAGS_FOR_TARGET="$${EMBOX_IMPORTED_LDFLAGS}"; \
+			CC_FOR_TARGET=$(EMBOX_GCC) \
+			CXX_FOR_TARGET=$(EMBOX_GXX) \
+			CFLAGS_FOR_TARGET="$(cppflags) $(target_libgcc_cppflags)" \
+			CXXFLAGS_FOR_TARGET="$(cppflags) -fpermissive" \
+			LDFLAGS_FOR_TARGET="" \
 	)
 	touch $@
 
 $(BUILD) :
 	cd $(PKG_BUILD_DIR) && ( \
 		. $(EMBOX_GCC_ENV) && $(MAKE) MAKEFLAGS='$${EMBOX_IMPORTED_MAKEFLAGS}' \
-			CC_FOR_TARGET=$${EMBOX_CROSS_COMPILE}gcc \
-			GCC_FOR_TARGET=$${EMBOX_CROSS_COMPILE}gcc \
-			CXX_FOR_TARGET=$${EMBOX_CROSS_COMPILE}g++ \
-			RAW_CXX_FOR_TARGET=$${EMBOX_CROSS_COMPILE}g++ \
+			CC_FOR_TARGET=$(EMBOX_GCC) \
+			GCC_FOR_TARGET=$(EMBOX_GCC) \
+			CXX_FOR_TARGET=$(EMBOX_GXX) \
+			RAW_CXX_FOR_TARGET=$(EMBOX_GXX) \
 			AR_FOR_TARGET=ar \
 			RANLIB_FOR_TARGET=ranlib \
          	TARGET-libiberty="LINKER=true CC=true AR=true RANLIB=touch all" \
@@ -74,7 +75,7 @@ $(BUILD) :
          	TARGET-fixincludes="LINKER=true CC=true AR=true all" \
 			TARGET-lto-plugin="CC=true LIBTOOL=true all" \
          	TARGET-gcc="LINKER=true CC=true CXX=true \
-				GCC_FOR_TARGET=$${EMBOX_CROSS_COMPILE}gcc \
+				GCC_FOR_TARGET=$(EMBOX_GCC) \
 				AR=true RANLIB=true libgcc-support stmp-int-hdrs" \
          	TARGET-target-libgcc="PICFLAG= EXTRA_PARTS= all" \
          	TARGET-target-libstdc++-v3="SUBDIRS=\"include libsupc++\" \
