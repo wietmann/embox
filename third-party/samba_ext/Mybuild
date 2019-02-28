@@ -24,6 +24,13 @@ module smbclient {
 	depends embox.compat.posix.fs.statvfs
 	depends embox.compat.posix.sys.mman.msync
 	depends embox.compat.posix.proc.atexit_api
+	depends embox.compat.posix.idx.pipe
+	depends embox.compat.posix.idx.select
+	depends embox.compat.posix.util.swab
+	depends embox.compat.posix.util.gethostname
+	depends embox.compat.posix.net.gethostbyaddr
+	depends embox.compat.posix.net.getservbyport
+	depends embox.compat.posix.fs.rewinddir_api
 
 	depends third_party.zlib.libs
 
