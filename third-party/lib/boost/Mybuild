@@ -1,7 +1,7 @@
-package third_party.boost
+package third_party.lib.boost
 
 @Build(script="$(EXTERNAL_MAKE)")
-@BuildArtifactPath(cppflags="-I$(abspath $(EXTERNAL_BUILD_DIR))/third_party/boost/core/include")
+@BuildArtifactPath(cppflags="-I$(abspath $(EXTERNAL_BUILD_DIR))/third_party/lib/boost/core/include")
 @BuildDepends(third_party.STLport.libstlportg)
 static module core {
 	@AddPrefix("^BUILD/extbld/^MOD_PATH/lib")

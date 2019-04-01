@@ -10,7 +10,7 @@ ExternalProject_Add(
    PATCH_COMMAND
       #cd $ENV{EMBOX_ROOT}/third-party/boost/tree &&
       #bash -c "cp -l -u -f --parents -t <SOURCE_DIR>/ `find . -not -path '*/.*' -and -type f`" &&
-      patch -p1 -d <SOURCE_DIR> -N --input=$ENV{EMBOX_ROOT}/third-party/boost/patch.txt &&
+      patch -p1 -d <SOURCE_DIR> -N --input=$ENV{EMBOX_ROOT}/third-party/lib/boost/patch.txt &&
       echo using gcc : : $ENV{EMBOX_DERIVED_CXX} \^^ >> <SOURCE_DIR>/tools/build/v2/user-config.jam &&
       true
    BUILD_IN_SOURCE 1
