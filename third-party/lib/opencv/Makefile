@@ -20,6 +20,7 @@ OPENCV_DIR   = $(BUILD_DIR)
 OPENCV_FLAGS = $(OPENCV_DIR)/flags
 
 EMBOX_IMPORTED_CPPFLAGS += -I../../stlport
+#EMBOX_IMPORTED_CPPFLAGS += -I/usr/arm-none-eabi/include/c++/8.3.0/
 EMBOX_IMPORTED_CPPFLAGS += -save-temps=obj
 EMBOX_IMPORTED_CPPFLAGS += -include $(abspath .)/stlport_embox_compat.h
 EMBOX_IMPORTED_CPPFLAGS += -DUSE_SPRINTF_INSTEAD
@@ -71,7 +72,7 @@ EMBOX_DERIVED_RTTI_FLAG  = $(EMBOX_RTTI_FLAG)
 EMBOX_DERIVED_CC         = $(EMBOX_TARGET_CC)
 EMBOX_DERIVED_CXX        = $(EMBOX_TARGET_CXX)
 
-INCLUDE_FLAGS := -I$(SRC_DIR)/include -I$(SRC_DIR)/compat/cxx/include -nostdinc
+INCLUDE_FLAGS := -I/home/dde/embox/build/extbld/third_party/STLport/libstlportg/include/stlport/ -I$(SRC_DIR)/include -I$(SRC_DIR)/compat/cxx/include -nostdinc
 INCLUDE_FLAGS += -I$(SRC_DIR)/compat/libc/include -I$(SRC_DIR)/compat/posix/include
 INCLUDE_FLAGS += -I$(SRC_DIR)/arch/$(ARCH)/include
 INCLUDE_FLAGS += -I$(SRC_DIR)/arch/$(ARCH)/include
@@ -83,7 +84,9 @@ INCLUDE_FLAGS += -I$(EXTERNAL_BUILD_DIR)/third_party/gcc/core/gcc-4.8.1/libstdc+
 INCLUDE_FLAGS += -I$(EXTERNAL_BUILD_DIR)/third_party/gcc/core/gcc-4.8.1/libstdc++-v3/config/cpu/generic/opt/
 INCLUDE_FLAGS += -I$(EXTERNAL_BUILD_DIR)/third_party/gcc/core/build/arm-none-eabi/libstdc++-v3/include/arm-none-eabi/
 
-OPENCV_CXX_FLAGS := $(INCLUDE_FLAGS)
+OPENCV_CXX_FLAGS := $(INCLUDE_FLAGS)  -I/home/dde/embox/build/extbld/third_party/STLport/libstlportg/include/stlport/ $(INCLUDE_FLAGS) $(EMBOX_IMPORTED_CXXFLAGS) -I/usr/arm-none-eabi/include/c++/8.3.0/ -I/usr/arm-none-eabi/include/c++/8.3.0/arm-none-eabi/
+
+
 
 OPENCV_FLAGS = \
 		-DBUILD_SHARED_LIBS=OFF -DBUILD_opencv_python_bindings_generator=OFF -DBUILD_JAVA=OFF -DBUILD_TESTS=OFF -DBUILD_opencv_apps=OFF BUILD_opencv_java_bindings_generator=OFF -DBUILD_opencv_ml=OFF -DWITH_FFMPEG=OFF -DWITH_EIGEN=OFF -DBUILD_IPP_IW=OFF -DBUILD_ITT=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_PROTOBUF=OFF \
