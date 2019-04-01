@@ -1,6 +1,7 @@
 package third_party.lib
 
 @Build(script="$(EXTERNAL_MAKE)")
+@BuildArtifactPath(cppflags="-I$(EXTERNAL_BUILD_DIR)/third_party/STLport/libstlportg/include/stlport")
 @BuildArtifactPath(cppflags_before="-I$(abspath $(EXTERNAL_BUILD_DIR))/third_party/STLport/core/include/stlport")
 static module opencv {
 	@AddPrefix("^BUILD/extbld/^MOD_PATH/install")
@@ -12,4 +13,6 @@ static module opencv {
 	@NoRuntime depends embox.compat.libc.all
 	@NoRuntime depends embox.compat.posix.pthread_key
 	depends third_party.STLport.core
+	depends third_party.lib.libsupcxx_toolchain
+	@NoRuntime depends third_party.STLport.libstlportg
 }
