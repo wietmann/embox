@@ -1,0 +1,26 @@
+package embox.cmd.sys
+
+@AutoCmd
+@Cmd(name = "printenv",
+	help = "Print all or part of enviroment",
+	man = '''
+		NAME
+			printenv - print all or part of enviroment
+		SYNOPSIS
+			printenv [OPTION]... [NAME]...
+		DESCRIPTION
+			Print the value of variable(s) with the specified NAME(s). If no NAME(s) specified, show all variables in environment.
+		OPTIONS
+			-0
+				end each output with null, not newline
+			-h
+				print help message
+		AUTHORS
+			Dmitry Danilov
+	''')
+module printenv {
+	source "printenv.c"
+
+	depends embox.compat.posix.util.environ
+	depends embox.framework.LibFramework
+}
