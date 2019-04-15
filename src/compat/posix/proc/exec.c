@@ -17,6 +17,8 @@
 #include <kernel/task/resource.h>
 #include <hal/vfork.h>
 
+#include <kernel/task/resource/env.h>
+
 static const char * exec_cmd_name(const char *path) {
 	size_t path_len;
 
@@ -122,6 +124,21 @@ int execv(const char *path, char *const argv[]) {
 }
 
 int execve(const char *path, char *const argv[], char *const envp[]) {
+	char **cur_env;
+	struct task_env *env;
+
+	env = task_self_resource_env();
+	// assertion
+
+	// clear env
+	// ...
+
+	// set new env
+	for(env = envp; *env; )
+	{
+		
+	}
+
 	return execv(path, argv);
 }
 
