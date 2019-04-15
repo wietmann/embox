@@ -18,6 +18,9 @@
 #include <hal/vfork.h>
 
 #include <kernel/task/resource/env.h>
+#include <util/array.h>
+
+#include <kernel/printk.h>
 
 static const char * exec_cmd_name(const char *path) {
 	size_t path_len;
@@ -124,21 +127,47 @@ int execv(const char *path, char *const argv[]) {
 }
 
 int execve(const char *path, char *const argv[], char *const envp[]) {
-	char **cur_env;
+	struct task_env old_env;
 	struct task_env *env;
+	size_t envp_len;
+	int ecode;
 
 	env = task_self_resource_env();
-	// assertion
+	memcpy(&old_env, env, sizeof(struct task_env));
+	
+	env->envs = NULL;
+	env->next = 0;
 
-	// clear env
-	// ...
+	for (int i = 0; envp[i]; ++i) {
+		if ((NULL == strchr(envp[i], '='))
+				|| ('=' == envp[i][0])) {
+			SET_ERRNO(EINVAL);
+			return -1;
+		}
+		if (env->next == ARRAY_SIZE(env->vals)) {
+			SET_ERRNO(E2BIG);
+			return -1;
+		}
+		envp_len = strlen(envp[i]);
+		if (envp_len >= ARRAY_SIZE(env->storage[0])) {
+			SET_ERRNO(ENOMEM);
+			return -1;
+		}
 
-	// set new env
-	for(env = envp; *env; )
-	{
+		/* TODO: think about multiple vars with the same name
+		 * SUSv3 states that "the consequences are undefiend"
+		 * https://pubs.opengroup.org/onlinepubs/7990989775/xbd/envvar.html
+		 */
 		
+		env->vals[env->next] = &env->storage[env->next][0];
+		if (!(env->next))
+			env->envs = &env->vals[0];
+		memcpy(env->vals[env->next], envp[i], envp_len + 1);
+		env->vals[++env->next] = NULL;
 	}
-
-	return execv(path, argv);
+	
+	ecode = execv(path, argv);
+	memcpy(env, &old_env, sizeof(struct task_env));
+	return ecode;
 }
 
