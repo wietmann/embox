@@ -1,0 +1,22 @@
+
+package embox.cmd.user
+
+@AutoCmd
+@Cmd(name = "nologin",
+	help = "Politely refuse a login",
+	man = '''
+		NAME
+			nologin - politely refuse a login
+		SYNOPSIS
+			nologin
+		AUTHOR
+			Dmitry Danilov
+	''')
+
+module nologin {
+	source "nologin.c"
+
+	option string message = "This account is currently not available."
+
+	depends embox.compat.libc.stdio.fputs
+}
