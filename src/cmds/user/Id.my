@@ -1,0 +1,25 @@
+
+package embox.cmd.user
+
+@AutoCmd
+@Cmd(name = "id",
+	help = "HELP MESSAGE",
+	man = '''
+		NAME
+			id - BRIEF
+		SYNOPSIS
+			id
+		DESCRIPTION
+			DESCRIPTION.
+		AUTHOR
+			John Doe
+	''')
+module id {
+	source "id.c"
+
+	//depends embox.compat.libc.stdio.printf
+	//depends embox.compat.libc.str
+	depends embox.compat.libc.all
+	depends embox.compat.posix.util.getopt
+	depends embox.compat.posix.passwd
+}
