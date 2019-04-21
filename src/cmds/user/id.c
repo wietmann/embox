@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <errno.h>
 #include <ctype.h>
 #include <limits.h>
@@ -10,7 +11,7 @@
 
 #define OPTSTR "gGunh"
 
-/* No UID_MAX set anywhere, so just look sys/types.h and set it accordingly */
+/* No UID_MAX set anywhere, so just look in sys/types.h and set it accordingly */
 #ifndef UID_MAX
 #define UID_MAX USHRT_MAX
 #endif
@@ -61,16 +62,15 @@ struct passwd *get_pwd_entry(char *user_name)
 	return pwd_entry;
 }
 
-//struct group *get_grp_entry(
-
 int main(int argc, char **argv) {
 	int print_user = 0, print_pgroup = 0, print_agroup = 0;
 	int print_names = 0;
 	char *user_name = NULL;
-	uid_t user_uid;
-	long uid_buf;
-	struct passwd *pwd_entry = NULL;
-	struct group *grp_entry = NULL;
+	char *group_name = NULL;
+	uid_t uid;
+	gid_t gid;
+	struct passwd *pwd_entry;
+	struct group *grp_entry;
 	
 	prog_name = argv[0];
 	
@@ -118,36 +118,7 @@ int main(int argc, char **argv) {
 		return -EINVAL;
 	}
 	
-	/*if (user_name) {
-		if (isnumber(user_name)) {
-			uid_buf = strtol(user_name, NULL, 10);
-			if (ERANGE == errno || uid_buf >= UID_MAX) {
-				printf("%s: UID value is out of range.\n", argv[0]);
-				return -1;
-			}
-			user_uid = (uid_t) uid_buf;
-			if (NULL == (pwd_entry = getpwuid(user_uid))) {
-				printf("%s: No user with such UID.\n", argv[0]);
-				return -1;
-			}
-			user_name = pwd_entry->pw_name;
-		}
-		else {
-			if (NULL == (pwd_entry = getpwnam(user_name))) {
-				printf("%s: No user with such name.\n", argv[0]);
-				return -1;
-			}
-			user_uid = pwd_entry->pw_uid;
-		}
-	}
-	else {
-		user_uid = getuid();
-		pwd_entry = getpwuid(user_uid);
-		user_name = pw_uid->pw_name;
-	}*/
-	
 	pwd_entry = get_pwd_entry(user_name);
-	
 	if (print_user) {
 		if (print_names)
 			printf("%s\n", pwd_entry->pw_name);
@@ -155,37 +126,53 @@ int main(int argc, char **argv) {
 			printf("%d\n", pwd_entry->pw_uid);
 		return 0;
 	}
-
 	
+	/* TODO: malloc is shit */
+	user_name = (char *) malloc((strlen(pwd_entry->pw_name)+1) * sizeof(char));
+	if (NULL == user_name) {
+		printf("%s: %s\n", argv[0], strerror(errno));
+		return -errno;
+	}
+	strcpy(user_name, pwd_entry->pw_name);
+	uid = pwd_entry->pw_uid;
 
-	/*if (print_user) {
-		if(user_name)
-		{
-			
-		}
-		else
-		{
-			user_uid = getuid();
-			if(print_names)
-			{
-				struct passwd *pwd = getpwuid(user_uid);
-				printf("%s\n", pwd->pw_name);
-			}
-			else
-			{
-				printf("%d\n", user_uid);
-			}
-		}
-	}
-	else if (print_pgroup) {
+	gid = pwd_entry->pw_gid;
+	if (print_pgroup && !print_names) {
+		printf("%d\n", gid);
 		
+		free(user_name);
+		return 0;
 	}
-	else if (print_agroup) {
-		
-	}
-	else {
-		
-	}*/
 
+	grp_entry = getgrgid(pwd_entry->pw_gid);
+	if (print_pgroup && print_names) {
+		printf("%s\n", grp_entry->gr_name);
+		
+		free(user_name);
+		return 0;
+	}
+	
+	group_name = (char *) malloc((strlen(grp_entry->gr_name)+1)*sizeof(char));
+	if (NULL == group_name) {
+		printf("%s: %s\n", argv[0], strerror(errno));
+		return -errno;
+	}
+	strcpy(group_name, grp_entry->gr_name);
+
+	/* Get secondary group list */
+	/* TODO: Implement */
+	if (print_agroup) {
+		printf("%s: Not implemented\n", argv[0]);
+		
+		free(user_name);
+		free(group_name);
+		return -ENOSYS;
+	}
+	
+	/* Print summary */
+	printf("uid=%d(%s) gid=%d(%s)\n", uid, user_name, gid, group_name);
+	
+	free(user_name);
+	free(group_name);
 	return 0;
 }
