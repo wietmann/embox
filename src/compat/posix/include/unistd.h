@@ -197,8 +197,8 @@ extern void _NORETURN _exit (int status);
 extern uid_t getuid(void);
 extern uid_t geteuid(void);
 
-extern uid_t getgid(void);
-extern uid_t getegid(void);
+extern gid_t getgid(void);
+extern gid_t getegid(void);
 
 extern int setreuid(uid_t ruid, uid_t euid);
 extern int setuid(uid_t uid);

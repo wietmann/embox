@@ -19,11 +19,11 @@ uid_t geteuid(void) {
 	return task_self_resource_u_area()->euid;
 }
 
-uid_t getgid(void) {
+gid_t getgid(void) {
 	return task_self_resource_u_area()->regid;
 }
 
-uid_t getegid(void) {
+gid_t getegid(void) {
 	return task_self_resource_u_area()->egid;
 }
 
