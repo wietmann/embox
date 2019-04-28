@@ -122,11 +122,6 @@ static inline ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset
 	return -1;
 }
 
-static inline struct group *getgrgid(gid_t gid) {
-	printf(">>> getgrgid %d\n", gid);
-	return NULL;
-}
-
 //XXX redefine malloc through sysmalloc. Revert it!
 #include <stdlib.h>
 #define malloc(x)     sysmalloc(x)
