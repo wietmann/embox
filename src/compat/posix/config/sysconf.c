@@ -15,6 +15,9 @@
 
 long int sysconf(int name) {
 	switch(name) {
+	/* We can just define _SC_* consts as 0 if corresponding max/min limits are indefinite */
+	case 0:
+		return -1;
 	case _SC_PAGESIZE:
 		return PAGE_SIZE();
 	case _SC_CLK_TCK:
