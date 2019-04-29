@@ -25,7 +25,6 @@ static module core {
 	source "atol.c"
 	source "itoa.c"
 
-	depends config
 	@NoRuntime depends rand /* qsort required*/
 }
 
@@ -44,7 +43,6 @@ static module multibyte {
 
 static module all {
 	depends core,
-		config,
 		rand,
 		system,
 		multibyte

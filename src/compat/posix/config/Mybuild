@@ -1,0 +1,8 @@
+package embox.compat.posix
+
+static module config {
+	source "getpagesize.c"
+	source "sysconf.c"
+
+	depends embox.mem.page_api
+}

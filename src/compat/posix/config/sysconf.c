@@ -28,6 +28,7 @@ long int sysconf(int name) {
 		//FIXME
 		return 0x1000;
 	default:
-		return -EINVAL;
+		SET_ERRNO(EINVAL);
+		return -1;
 	}
 }

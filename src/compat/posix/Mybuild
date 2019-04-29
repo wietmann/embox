@@ -12,6 +12,7 @@ module LibPosix {
 	depends embox.compat.posix.timerfd
 	depends embox.compat.posix.fnmatch
 	depends embox.compat.posix.utime
+	depends embox.compat.posix.config
 	depends sched
 	depends termios
 	depends embox.kernel.task.resource.errno
